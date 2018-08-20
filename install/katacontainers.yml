@@ -1,0 +1,26 @@
+---
+- block:
+    - name: Install Kata Containers repository key (Ubuntu)
+      apt_key:
+        url: http://download.opensuse.org/repositories/home:/katacontainers:/release/xUbuntu_{{ ansible_lsb.release }}/Release.key
+        state: present
+
+    - name: Install Kata Containers repository (Ubuntu)
+      apt_repository:
+        repo: "deb http://download.opensuse.org/repositories/home:/katacontainers:/release/xUbuntu_{{ ansible_lsb.release }}/ /"
+        state: present
+        filename: kata-runtime
+
+    - name: Update apt (Ubuntu)
+      apt: update_cache=yes
+  
+    - name: Install Kata Containers (Ubuntu)
+      action: apt pkg={{ item }} state=installed
+      with_items:
+        - kata-runtime
+        - kata-proxy
+        - kata-shim
+  when: ansible_distribution == "Ubuntu" 
+  
+- name: Hardware requirements for Kata Containers
+  command: kata-runtime kata-check
